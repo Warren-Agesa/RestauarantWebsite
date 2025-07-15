@@ -1,0 +1,71 @@
+<!-- filepath: c:\Users\Dan Pc\madola_restaurant\restaurant\templates\restaurant\cart.html -->
+{% extends "restaurant/base.html" %}
+{% load static %}
+{% block title %}Your Cart{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Your Cart ({{ cart_items|length }} items)</h2>
+    {% if cart_items %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover bg-white rounded">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+                            {% else %}
+                                <span class="text-muted">No Image</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ item.product.name }}</strong><br>
+                            {% if item.product.description %}
+                                <span style="color: orange;">{{ item.product.description }}</span><br>
+                            {% endif %}
+                        </td>
+                        <td>KSh {{ item.product.price }}</td>
+                        <td>
+                            <form method="post" action="{% url 'add_to_cart' item.product.id %}" class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentNode.querySelector('input[type=number]').stepDown();">-</button>
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm mx-1 text-center" style="width:60px;">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentNode.querySelector('input[type=number]').stepUp();">+</button>
+                                <button type="submit" class="btn btn-primary btn-sm ml-2">Update</button>
+                            </form>
+                        </td>
+                        <td>KSh {{ item.total_price }}</td>
+                        <td>
+                            <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="summary mt-4">
+            <p><strong>Subtotal:</strong> KSh {{ cart_total }}</p>
+            <!-- If you want to add tax/shipping, add here -->
+            <p style="color: green;">Congrats, you're eligible for <strong>Free Shipping</strong></p>
+            <a href="{% url 'checkout' %}" class="btn btn-success btn-lg mt-2">Check out</a>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            Your cart is empty. <a href="{% url 'menu' %}">Browse menu</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

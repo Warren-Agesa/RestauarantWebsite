@@ -1,0 +1,62 @@
+
+{% extends "restaurant/base.html" %}
+{% load static %}
+{% block title %}About Us | Madola Restaurant{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <img src="{% static 'restaurant/image/About.jpeg' %}" alt="About Madola Restaurant" class="img-fluid rounded shadow" style="max-height:350px; object-fit:cover;">
+        </div>
+        <div class="col-lg-6">
+            <h1 class="mb-3" style="color:#556B2F;">About Madola Restaurant</h1>
+            <p class="lead" style="color:#8B5E3C;">
+                Madola Restaurant is dedicated to bringing you the freshest, most authentic flavors in a warm and welcoming atmosphere. Our chefs use locally-sourced ingredients to craft dishes that celebrate tradition and creativity.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h3 class="mb-3" style="color:#8B5E3C;">Our Services</h3>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-utensils mr-2" style="color:#556B2F;"></i> Dine-in Restaurant</li>
+                <li><i class="fas fa-truck mr-2" style="color:#8B5E3C;"></i> Takeaway & Delivery</li>
+                <li><i class="fas fa-leaf mr-2" style="color:#A8C686;"></i> Vegan & Gluten-Free Options</li>
+                <li><i class="fas fa-birthday-cake mr-2" style="color:#8B5E3C;"></i> Event Catering & Private Parties</li>
+                <li><i class="fas fa-coffee mr-2" style="color:#8B5E3C;"></i> Specialty Drinks & Desserts</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h3 class="mb-3" style="color:#8B5E3C;">Our History</h3>
+            <p>
+                Founded in 2015, Madola Restaurant began as a small family eatery with a passion for quality and community. Over the years, we've grown into a beloved local destination, known for our friendly service and unforgettable meals.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h3 class="mb-3" style="color:#556B2F;">Our Mission</h3>
+            <p>
+                To serve delicious, wholesome food made from the finest ingredients, while creating a welcoming space for all our guests.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h3 class="mb-3" style="color:#556B2F;">Our Vision</h3>
+            <p>
+                To be the leading restaurant in our community, inspiring joy and connection through food and hospitality.
+            </p>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="bg-primary-custom text-white rounded p-5 text-center mb-5">
+        <h2 class="mb-3">Ready to Experience Madola?</h2>
+        <p class="mb-4">Reserve your table or order online and enjoy the best of our kitchen!</p>
+        <a href="{% url 'reserve' %}" class="btn btn-light btn-lg mr-2" style="color:#556B2F;">Reserve Now</a>
+        <a href="{% url 'menu' %}" class="btn btn-outline-light btn-lg" style="border-color:#FAFAF0; color:#FAFAF0;">View Menu</a>
+    </div>
+</div>
+{% endblock %}

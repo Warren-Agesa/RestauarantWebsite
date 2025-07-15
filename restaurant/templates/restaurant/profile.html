@@ -1,0 +1,9 @@
+{% extends "restaurant/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Your Profile</h2>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "restaurant/base.html" %}
+{% load static %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2>Checkout</h2>
+    <p>Total Amount: <strong>KSh {{ cart_total }}</strong></p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'process_payment' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="phone">M-Pesa Phone Number:</label>
+            <input type="text" name="phone" class="form-control" placeholder="e.g. 254712345678" required>
+        </div>
+        <button type="submit" class="btn btn-success">Pay with M-Pesa</button>
+    </form>
+</div>
+{% endblock %}

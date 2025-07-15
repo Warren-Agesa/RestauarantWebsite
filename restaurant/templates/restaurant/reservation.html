@@ -1,0 +1,55 @@
+{% extends 'restaurant/base.html' %}
+
+{% block title %}Reservation | Madola{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Book a Table at Madola</h2>
+    <p class="text-center text-muted mb-5">We look forward to serving you! Please fill out the form below to reserve your table.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success text-center">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" novalidate class="shadow p-4 rounded bg-light">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_name">Name</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    {{ form.email }}
+                </div>
+                <div class="form-group">
+                    <label for="id_phone">Phone</label>
+                    {{ form.phone }}
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="id_date">Date</label>
+                        {{ form.date }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="id_time">Time</label>
+                        {{ form.time }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_guests">Number of Guests</label>
+                    {{ form.guests }}
+                </div>
+                <div class="form-group">
+                    <label for="id_message">Special Requests</label>
+                    {{ form.message }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Confirm Reservation</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

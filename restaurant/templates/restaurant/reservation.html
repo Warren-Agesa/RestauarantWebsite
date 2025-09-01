@@ -1,53 +1,96 @@
-{% extends 'restaurant/base.html' %}
+{% extends "restaurant/base.html" %}
+{% load static %}
 
-{% block title %}Reservation | Madola{% endblock %}
+{% block title %}Reservation | Madola Restaurant{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Book a Table at Madola</h2>
-    <p class="text-center text-muted mb-5">We look forward to serving you! Please fill out the form below to reserve your table.</p>
+<!-- Page Header -->
+<div class="bg-light py-4 mb-5 text-center shadow-sm border-bottom">
+    <h2 class="text-uppercase mb-2" style="color:#2F4F4F;">Reservation</h2>
+    <p class="mb-3 text-muted">
+        Book your table in advance and let us serve you the Madola way.
+    </p>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success text-center">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="d-flex justify-content-center">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded shadow-sm mb-0">
+            <li class="breadcrumb-item">
+                <a href="{% url 'index' %}">Home</a>
+            </li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">
+                Reservation
+            </li>
+        </ol>
+    </nav>
+</div>
 
+<!-- Reservation Form Section -->
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <form method="POST" novalidate class="shadow p-4 rounded bg-light">
+        <div class="col-lg-8">
+            <!-- Section Title -->
+            <h2 class="text-center mb-3" style="color:#2F4F4F;">Book Your Table</h2>
+            <p class="text-center text-muted mb-4">
+                We’re excited to host you. Please provide your details below to secure your spot.
+            </p>
+
+            <!-- Success Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Reservation Form -->
+            <form method="POST" novalidate class="shadow p-4 rounded bg-white">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_name">Name</label>
+
+                <!-- Guest Info -->
+                <div class="form-group mb-3">
+                    <label for="id_name">Full Name</label>
                     {{ form.name }}
                 </div>
-                <div class="form-group">
-                    <label for="id_email">Email</label>
+
+                <div class="form-group mb-3">
+                    <label for="id_email">Email Address</label>
                     {{ form.email }}
                 </div>
-                <div class="form-group">
-                    <label for="id_phone">Phone</label>
+
+                <div class="form-group mb-3">
+                    <label for="id_phone">Phone Number</label>
                     {{ form.phone }}
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="id_date">Date</label>
+
+                <!-- Date & Time -->
+                <div class="row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="id_date">Reservation Date</label>
                         {{ form.date }}
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="id_time">Time</label>
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="id_time">Reservation Time</label>
                         {{ form.time }}
                     </div>
                 </div>
-                <div class="form-group">
+
+                <!-- Guests -->
+                <div class="form-group mb-3">
                     <label for="id_guests">Number of Guests</label>
                     {{ form.guests }}
                 </div>
-                <div class="form-group">
-                    <label for="id_message">Special Requests</label>
+
+                <!-- Special Requests -->
+                <div class="form-group mb-4">
+                    <label for="id_message">Special Requests (Optional)</label>
                     {{ form.message }}
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Confirm Reservation</button>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-success w-100 py-2">
+                    Confirm My Reservation
+                </button>
             </form>
         </div>
     </div>

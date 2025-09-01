@@ -1,0 +1,11 @@
+<!-- filepath: c:\Users\Dan Pc\madola_restaurant\restaurant\templates\restaurant\order_success.html -->
+{% extends "restaurant/base.html" %}
+{% block title %}Order Success{% endblock %}
+{% block content %}
+<div class="container-fluid py-5 px-lg-5">
+    <h2 class="mb-4 text-success">Thank you for your order!</h2>
+    <p>Your order has been placed successfully. You will receive updates on your order progress.</p>
+    <a href="{% url 'view_order' order_id=order.id %}" class="btn btn-primary mt-3">View Your Order</a>
+    <a href="{% url 'menu' %}" class="btn btn-outline-secondary mt-3">Back to Menu</a>
+</div>
+{% endblock %}

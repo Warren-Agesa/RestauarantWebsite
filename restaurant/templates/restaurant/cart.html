@@ -1,21 +1,23 @@
-<!-- filepath: c:\Users\Dan Pc\madola_restaurant\restaurant\templates\restaurant\cart.html -->
 {% extends "restaurant/base.html" %}
 {% load static %}
 {% block title %}Your Cart{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4">Your Cart ({{ cart_items|length }} items)</h2>
-    {% if cart_items %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover bg-white rounded">
+<div class="container-fluid py-5">
+    <div class="container">
+        <h2 class="mb-4 text-center">Your Cart ({{ cart_items|length }} item{{ cart_items|length|pluralize }})</h2>
+
+        {% if cart_items %}
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-hover bg-white rounded shadow-sm">
                 <thead class="thead-light">
                     <tr>
-                        <th>Image</th>
-                        <th>Item</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                        <th>Remove</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Remove</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,32 +25,32 @@
                     <tr>
                         <td>
                             {% if item.product.image %}
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width:60px; height:60px; object-fit:cover;">
                             {% else %}
                                 <span class="text-muted">No Image</span>
                             {% endif %}
                         </td>
                         <td>
-                            <strong>{{ item.product.name }}</strong><br>
+                            <strong>{{ item.product.name }}</strong>
                             {% if item.product.description %}
-                                <span style="color: orange;">{{ item.product.description }}</span><br>
+                                <div class="text-muted small mt-1">{{ item.product.description }}</div>
                             {% endif %}
                         </td>
                         <td>KSh {{ item.product.price }}</td>
                         <td>
                             <form method="post" action="{% url 'add_to_cart' item.product.id %}" class="d-flex align-items-center">
                                 {% csrf_token %}
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentNode.querySelector('input[type=number]').stepDown();">-</button>
-                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm mx-1 text-center" style="width:60px;">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentNode.querySelector('input[type=number]').stepUp();">+</button>
-                                <button type="submit" class="btn btn-primary btn-sm ml-2">Update</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="this.parentNode.querySelector('input[type=number]').stepDown();">−</button>
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm mx-2 text-center" style="width:60px;" required>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="this.parentNode.querySelector('input[type=number]').stepUp();">+</button>
+                                <button type="submit" class="btn btn-sm btn-primary ml-2">Update</button>
                             </form>
                         </td>
                         <td>KSh {{ item.total_price }}</td>
                         <td>
                             <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                             </form>
                         </td>
                     </tr>
@@ -56,16 +58,26 @@
                 </tbody>
             </table>
         </div>
-        <div class="summary mt-4">
-            <p><strong>Subtotal:</strong> KSh {{ cart_total }}</p>
-            <!-- If you want to add tax/shipping, add here -->
-            <p style="color: green;">Congrats, you're eligible for <strong>Free Shipping</strong></p>
-            <a href="{% url 'checkout' %}" class="btn btn-success btn-lg mt-2">Check out</a>
+
+        <!-- Order Summary -->
+        <div class="row justify-content-end">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Summary</h5>
+                        <p class="mb-1"><strong>Subtotal:</strong> KSh {{ cart_total }}</p>
+                        <p class="text-success small">🎉 Congrats! You qualify for <strong>Free Shipping</strong></p>
+                        <a href="{% url 'checkout' %}" class="btn btn-success btn-block mt-3">Proceed to Checkout</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% else %}
+        {% else %}
+        <!-- Empty Cart Message -->
         <div class="alert alert-info text-center">
-            Your cart is empty. <a href="{% url 'menu' %}">Browse menu</a>
+            Your cart is empty. <a href="{% url 'menu' %}">Browse our menu</a> to start adding delicious meals!
         </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

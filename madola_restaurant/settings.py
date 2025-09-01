@@ -128,12 +128,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yourprovider.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'your@email.com'
-EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_HOST_USER = 'warrenkaranja11@gmail.com'
+EMAIL_HOST_PASSWORD = 'hvltrhpfpvhmbvne'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'your@email.com'
+DEFAULT_FROM_EMAIL = 'warrenfred98@gmail.com'
+
+OWNER_EMAIL = 'warrenkaranja11@gmail.com'
 
 FACEBOOK_URL = "https://facebook.com/yourpage"
 TWITTER_URL = "https://twitter.com/yourprofile"

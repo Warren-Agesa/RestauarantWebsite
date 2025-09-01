@@ -1,22 +1,50 @@
 {% extends "restaurant/base.html" %}
 {% load static %}
+
 {% block title %}Contact Us | Madola Restaurant{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+<!-- Header and Breadcrumb Box -->
+<div class="bg-light p-4 mb-5 rounded shadow-sm border"
+     style="background: url('{% static 'restaurant/image/breadcrumb.jpeg' %}') center/cover no-repeat;">
+    <div class="text-center">
+        <h2 class="text-uppercase mb-2" style="color:#8B5E3C;">CONTACT US</h2>
+        <p class="mb-3" style="color:#2a7f62;">
+            If you have any issue or you are looking for our restaurant, our information is down below.
+        </p>
+        <!-- Centered Breadcrumb -->
+        <div class="d-flex justify-content-center">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-white px-3 py-2 rounded shadow-sm mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'index' %}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active text-muted" aria-current="page">
+                        Contact Us
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Section Full Width -->
+<div class="container-fluid py-5 px-lg-5">
+    <div class="row">
+        <div class="col-12">
             {% if success %}
                 <div class="alert alert-success" role="alert">
                     Thank you for contacting us! We have received your message.
                 </div>
             {% endif %}
+
             <div class="row bg-white shadow rounded-lg overflow-hidden">
                 <!-- Contact Info -->
                 <div class="col-md-6 p-4 bg-light">
                     <h2 class="mb-4" style="color:#556B2F;">Contact Us</h2>
                     <p class="lead" style="color:#8B5E3C;">
-                        We'd love to hear from you! Whether you have a question, feedback, or want to make a reservation, please reach out.
+                        We'd love to hear from you! Whether you have a question, feedback,
+                        or want to make a reservation, please reach out.
                     </p>
                     <ul class="list-unstyled mb-4">
                         <li class="mb-3">
@@ -33,9 +61,15 @@
                         </li>
                     </ul>
                     <div class="d-flex">
-                        <a href="{{ settings.FACEBOOK_URL }}" class="btn btn-outline-primary mr-2" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ settings.TWITTER_URL }}" class="btn btn-outline-info mr-2" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="{{ settings.INSTAGRAM_URL }}" class="btn btn-outline-danger" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ settings.FACEBOOK_URL }}" class="btn btn-outline-primary mr-2" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="{{ settings.TWITTER_URL }}" class="btn btn-outline-info mr-2" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="{{ settings.INSTAGRAM_URL }}" class="btn btn-outline-danger" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
                     </div>
                 </div>
 
@@ -66,7 +100,7 @@
                 <h5 class="mb-3 text-center">Find Us Here</h5>
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.154792438516!2d36.8219466!3d-1.2920659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d7e6b2e8e7%3A0x7c8e1e7b8b8b8b8b!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
-                    width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy">
+                    width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
                 </iframe>
             </div>
         </div>

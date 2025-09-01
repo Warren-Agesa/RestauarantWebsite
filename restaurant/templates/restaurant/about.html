@@ -1,62 +1,168 @@
-
-{% extends "restaurant/base.html" %}
+{% extends 'restaurant/base.html' %}
 {% load static %}
+
 {% block title %}About Us | Madola Restaurant{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row align-items-center mb-5">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="{% static 'restaurant/image/About.jpeg' %}" alt="About Madola Restaurant" class="img-fluid rounded shadow" style="max-height:350px; object-fit:cover;">
-        </div>
-        <div class="col-lg-6">
-            <h1 class="mb-3" style="color:#556B2F;">About Madola Restaurant</h1>
-            <p class="lead" style="color:#8B5E3C;">
-                Madola Restaurant is dedicated to bringing you the freshest, most authentic flavors in a warm and welcoming atmosphere. Our chefs use locally-sourced ingredients to craft dishes that celebrate tradition and creativity.
-            </p>
-        </div>
-    </div>
 
-    <div class="row mb-5">
-        <div class="col-md-6">
-            <h3 class="mb-3" style="color:#8B5E3C;">Our Services</h3>
-            <ul class="list-unstyled">
-                <li><i class="fas fa-utensils mr-2" style="color:#556B2F;"></i> Dine-in Restaurant</li>
-                <li><i class="fas fa-truck mr-2" style="color:#8B5E3C;"></i> Takeaway & Delivery</li>
-                <li><i class="fas fa-leaf mr-2" style="color:#A8C686;"></i> Vegan & Gluten-Free Options</li>
-                <li><i class="fas fa-birthday-cake mr-2" style="color:#8B5E3C;"></i> Event Catering & Private Parties</li>
-                <li><i class="fas fa-coffee mr-2" style="color:#8B5E3C;"></i> Specialty Drinks & Desserts</li>
-            </ul>
-        </div>
-        <div class="col-md-6">
-            <h3 class="mb-3" style="color:#8B5E3C;">Our History</h3>
-            <p>
-                Founded in 2015, Madola Restaurant began as a small family eatery with a passion for quality and community. Over the years, we've grown into a beloved local destination, known for our friendly service and unforgettable meals.
-            </p>
-        </div>
-    </div>
-
-    <div class="row mb-5">
-        <div class="col-md-6">
-            <h3 class="mb-3" style="color:#556B2F;">Our Mission</h3>
-            <p>
-                To serve delicious, wholesome food made from the finest ingredients, while creating a welcoming space for all our guests.
-            </p>
-        </div>
-        <div class="col-md-6">
-            <h3 class="mb-3" style="color:#556B2F;">Our Vision</h3>
-            <p>
-                To be the leading restaurant in our community, inspiring joy and connection through food and hospitality.
-            </p>
-        </div>
-    </div>
-
-    <!-- Call to Action Section -->
-    <div class="bg-primary-custom text-white rounded p-5 text-center mb-5">
-        <h2 class="mb-3">Ready to Experience Madola?</h2>
-        <p class="mb-4">Reserve your table or order online and enjoy the best of our kitchen!</p>
-        <a href="{% url 'reserve' %}" class="btn btn-light btn-lg mr-2" style="color:#556B2F;">Reserve Now</a>
-        <a href="{% url 'menu' %}" class="btn btn-outline-light btn-lg" style="border-color:#FAFAF0; color:#FAFAF0;">View Menu</a>
+<!-- Header Section (same style as Reservation page) -->
+<div class="bg-light py-5 mb-5 shadow-sm border">
+    <div class="container text-center">
+        <h2 class="text-uppercase mb-2" style="color:#8B5E3C;">ABOUT US</h2>
+        <p class="mb-3 text-muted">
+            Fresh. Delicious. Made with Love.
+        </p>
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'index' %}">Home</a>
+                </li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">
+                    About Us
+                </li>
+            </ol>
+        </nav>
     </div>
 </div>
+
+<!-- Our Story -->
+<div class="container-fluid py-5 px-lg-5">
+    <div class="row align-items-center bg-white shadow rounded-lg overflow-hidden">
+        <!-- Image -->
+        <div class="col-lg-6 p-0">
+            <img src="{% static 'restaurant/Image/About.jpeg' %}" 
+                 alt="About Madola"
+                 class="img-fluid w-100 h-100 object-fit-cover">
+        </div>
+        <!-- Text -->
+        <div class="col-lg-6 p-5">
+            <h2 class="fw-bold mb-3" style="color:#556B2F;">Our Story</h2>
+            <p class="text-muted">
+                Madola Restaurant was born from a passion for authentic flavors and a love for bringing people together. 
+                We create memorable dining experiences with fresh ingredients, traditional recipes, and a touch of modern flair.
+            </p>
+            <p class="text-muted">
+                Whether you’re here for a casual lunch, a romantic dinner, or a family celebration — you’ll always feel at home at Madola.
+            </p>
+            <a href="{% url 'menu' %}" class="btn btn-success btn-lg mt-3 shadow-sm">
+                View Our Menu
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Mission & Vision -->
+<div class="container-fluid py-5 px-lg-5 bg-light">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Our Mission & Vision</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="p-4 bg-white rounded shadow h-100">
+                <i class="fas fa-bullseye fa-3x text-primary mb-3"></i>
+                <h5 class="fw-bold">Our Mission</h5>
+                <p class="text-muted">
+                    To provide our guests with fresh, flavorful, and authentic dishes served in a warm and welcoming atmosphere.
+                    We strive to make every meal a memorable experience.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="p-4 bg-white rounded shadow h-100">
+                <i class="fas fa-eye fa-3x text-success mb-3"></i>
+                <h5 class="fw-bold">Our Vision</h5>
+                <p class="text-muted">
+                    To be the most loved restaurant in the community, known for our passion, innovation, and commitment 
+                    to exceptional quality in both food and service.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="container-fluid py-5 px-lg-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Why Choose Us</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow h-100">
+                <i class="fas fa-leaf fa-3x text-success mb-3"></i>
+                <h5 class="fw-bold">Fresh Ingredients</h5>
+                <p class="text-muted">We use locally sourced ingredients for maximum freshness and flavor.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow h-100">
+                <i class="fas fa-utensils fa-3x text-danger mb-3"></i>
+                <h5 class="fw-bold">Authentic Recipes</h5>
+                <p class="text-muted">Preserving the heritage of recipes while adding our unique touch.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded shadow h-100">
+                <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                <h5 class="fw-bold">Exceptional Service</h5>
+                <p class="text-muted">Our hospitality makes every guest feel like family.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meet Our Chefs -->
+<div class="container-fluid py-5 px-lg-5 bg-light">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Meet Our Chefs</h2>
+    </div>
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <img src="{% static 'img/chef1.jpg' %}" alt="Chef Giovanni"
+                 class="img-fluid rounded-circle shadow-lg mb-3" style="width:180px; height:180px; object-fit:cover;">
+            <h5 class="fw-bold">Chef Giovanni</h5>
+            <p class="text-muted">Head Chef & Culinary Visionary</p>
+        </div>
+        <div class="col-md-4">
+            <img src="{% static 'img/chef2.jpg' %}" alt="Chef Maria"
+                 class="img-fluid rounded-circle shadow-lg mb-3" style="width:180px; height:180px; object-fit:cover;">
+            <h5 class="fw-bold">Chef Maria</h5>
+            <p class="text-muted">Pastry Artist & Dessert Specialist</p>
+        </div>
+        <div class="col-md-4">
+            <img src="{% static 'img/chef3.jpg' %}" alt="Chef Ahmed"
+                 class="img-fluid rounded-circle shadow-lg mb-3" style="width:180px; height:180px; object-fit:cover;">
+            <h5 class="fw-bold">Chef Ahmed</h5>
+            <p class="text-muted">Grill Master & Flavor Innovator</p>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials -->
+<div class="container-fluid py-5 px-lg-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">What Our Customers Say</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <blockquote class="p-4 bg-white rounded shadow h-100">
+                <p>"The food is absolutely amazing! The atmosphere feels like home."</p>
+                <footer class="text-muted">— Sarah W.</footer>
+            </blockquote>
+        </div>
+        <div class="col-md-4">
+            <blockquote class="p-4 bg-white rounded shadow h-100">
+                <p>"Best dining experience in town. Fresh flavors and great service."</p>
+                <footer class="text-muted">— James K.</footer>
+            </blockquote>
+        </div>
+        <div class="col-md-4">
+            <blockquote class="p-4 bg-white rounded shadow h-100">
+                <p>"Their desserts are heavenly. Highly recommend the tiramisu!"</p>
+                <footer class="text-muted">— Alice M.</footer>
+            </blockquote>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

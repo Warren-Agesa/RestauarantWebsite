@@ -14,7 +14,7 @@ urlpatterns = [
     path('cart/add/<int:item_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.view_cart, name='view_cart'),
     path('login/', views.CustomLoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='index'), name='logout'),
+    path('logout/', views.custom_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
     path('checkout/', views.checkout, name='checkout'),
@@ -26,5 +26,8 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('checkout/', views.checkout, name='checkout'),
     path('process-payment/', views.process_payment, name='process_payment'),
-
+    path('order-success/<int:order_id>/', views.order_success, name='order_success'),
+    path('order/<int:order_id>/', views.view_order, name='view_order'),
+    path('book-event/', views.event_booking, name='event_booking'),
+    path('my-orders/', views.my_orders, name='my_orders'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

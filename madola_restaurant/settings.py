@@ -176,3 +176,8 @@ PASSKEY = os.environ.get("PASSKEY")
 CALLBACK_URL = os.environ.get("CALLBACK_URL")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-temp-key-for-dev")
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://web-production-9c9e7.up.railway.app",
+    "https://www.mydomain.com",
+]

@@ -82,9 +82,9 @@ TEMPLATES = [
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+        default=os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3"),
         conn_max_age=600,
-        engine='django.db.backends.postgresql'
+        engine='django.db.backends.postgresql_psycopg2',
     )
 }
 
@@ -174,3 +174,5 @@ CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
 SHORTCODE = os.environ.get("SHORTCODE")
 PASSKEY = os.environ.get("PASSKEY")
 CALLBACK_URL = os.environ.get("CALLBACK_URL")
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-temp-key-for-dev")

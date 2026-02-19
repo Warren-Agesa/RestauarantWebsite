@@ -1,16 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import MenuItem, Review, ContactMessage, Reservation, Order, OrderItem, Payment, EventBooking,HeroSlide, Event
-from django.shortcuts import render
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.contrib import messages
-from .forms import ReservationForm, CustomUserCreationForm, EventBookingForm
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView
-from django.contrib.auth import logout
-from .utils.mpesa import lipa_na_mpesa
+from django.contrib.auth import logout, authenticate, login
+from django.views.decorators.http import require_POST
+
+from .models import (
+    MenuItem, Review, ContactMessage, Reservation, Order, OrderItem,
+    Payment, EventBooking, HeroSlide, Event
+)
+from .forms import ReservationForm, CustomUserCreationForm, EventBookingForm
+from payments.views import lipa_na_mpesa
+
+
+# ---------- Public views ----------
 
 def index(request):
     featured_dishes = MenuItem.objects.filter(available=True)[:3]
@@ -23,9 +29,9 @@ def index(request):
         'special_menu': special_menu,
         'top_selling': top_selling,
         'hero_slides': hero_slides,
-        'events': events
-
+        'events': events,
     })
+
 
 def menu_view(request):
     menu_items = MenuItem.objects.filter(available=True)
@@ -37,6 +43,7 @@ def menu_view(request):
     category = request.GET.get('category')
     if category and category != 'all':
         menu_items = menu_items.filter(category=category)
+
     sort = request.GET.get('sort')
     if sort == 'price_asc':
         menu_items = menu_items.order_by('price')
@@ -44,7 +51,7 @@ def menu_view(request):
         menu_items = menu_items.order_by('-price')
     elif sort == 'name':
         menu_items = menu_items.order_by('name')
-    else:  
+    else:
         menu_items = menu_items.order_by('-created_at')
 
     paginator = Paginator(menu_items, 6)
@@ -66,9 +73,8 @@ def about(request):
 
 def menu_detail(request, slug):
     product = get_object_or_404(MenuItem, slug=slug)
-    related_products = MenuItem.objects.filter(
-        category=product.category
-    ).exclude(id=product.id)[:3]
+    related_products = MenuItem.objects.filter(category=product.category).exclude(id=product.id)[:3]
+
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         rating = request.POST.get('rating')
@@ -80,25 +86,38 @@ def menu_detail(request, slug):
                 rating=rating,
                 comment=comment
             )
-    return render(request, 'restaurant/product_detail.html', {'product': product, 'related_products': related_products,})
+            messages.success(request, "Thank you for your review!")
+            return redirect('menu_detail', slug=slug)
+
+    return render(request, 'restaurant/product_detail.html', {
+        'product': product,
+        'related_products': related_products,
+    })
 
 
 def contact(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        ContactMessage.objects.create(name=name, email=email, message=message)
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        message_text = request.POST.get('message', '').strip()
+
+        ContactMessage.objects.create(name=name, email=email, message=message_text)
+
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        recipient = getattr(settings, 'OWNER_EMAIL', None) or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        recipient_list = [recipient] if recipient else ['warrenfred98@gmail.com']
+
         send_mail(
-            subject=f"New Contact Message from {name}",
-            message=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}",
-            from_email=None,  
-            recipient_list=['warrenfred98@gmail.com'],
-            fail_silently=False,  
+            subject=f"New Contact Message from {name or 'Anonymous'}",
+            message=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message_text}",
+            from_email=from_email,
+            recipient_list=recipient_list,
+            fail_silently=False,
         )
 
         messages.success(request, "Your message was sent successfully!")
         return redirect('index')
+
     return render(request, 'restaurant/contact.html')
 
 
@@ -108,6 +127,7 @@ def reservation_view(request):
         if form.is_valid():
             reservation = form.save()
             messages.success(request, 'Reservation submitted successfully!')
+
             subject = f"New Reservation from {reservation.name}"
             message = (
                 f"Name: {reservation.name}\n"
@@ -118,12 +138,16 @@ def reservation_view(request):
                 f"Guests: {reservation.guests}\n"
                 f"Special Requests: {reservation.message or 'None'}"
             )
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [settings.OWNER_EMAIL])
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+            recipient = getattr(settings, 'OWNER_EMAIL', None)
+            if recipient:
+                send_mail(subject, message, from_email, [recipient], fail_silently=True)
 
             return redirect('index')
     else:
         form = ReservationForm()
     return render(request, 'restaurant/reservation.html', {'form': form})
+
 
 def register(request):
     if request.method == 'POST':
@@ -137,19 +161,40 @@ def register(request):
     return render(request, 'restaurant/register.html', {'form': form})
 
 
+# ---------- Auth / profile ----------
+
 @login_required
 def profile(request):
     return render(request, 'restaurant/profile.html')
 
+
+class CustomLoginView(LoginView):
+    template_name = 'restaurant/login.html'
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return self.request.GET.get('next') or '/'
+
+
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('index')
+
+
+# ---------- Cart & Checkout ----------
+
 @login_required
 def checkout(request):
+    """
+    Initiates payment via Mpesa and creates an Order when payment initiation is successful.
+    Checkout requires login.
+    """
     cart = request.session.get('cart', {})
     if not isinstance(cart, dict):
         cart = {}
 
-    cart_items = []
-    cart_total = 0
-
+    cart_items, cart_total = [], 0
     for item_id, quantity in cart.items():
         try:
             item_id = int(item_id)
@@ -183,16 +228,27 @@ def checkout(request):
                 'cart_items': cart_items,
                 'cart_total': cart_total,
             })
+
+        # Call Daraja STK Push
         response = lipa_na_mpesa(phone, cart_total)
 
-        if isinstance(response, dict) and response.get("ResponseCode") == "0":
+        if not response:
+            messages.error(request, "Payment gateway did not respond. Try again later.")
+            return render(request, 'restaurant/checkout.html', {
+                'cart_items': cart_items,
+                'cart_total': cart_total,
+            })
+
+        response_code = str(response.get("ResponseCode")) if isinstance(response, dict) else None
+        if response_code == "0" or "success" in response.get("ResponseDescription", "").lower():
+            # Create order + payment
             order = Order.objects.create(
                 user=request.user,
                 delivery_option=delivery_option,
                 delivery_address=delivery_address if delivery_option == 'delivery' else '',
                 total=cart_total,
                 phone=phone,
-                status='paid'
+                status='pending'  # will be updated by callback
             )
             for item in cart_items:
                 OrderItem.objects.create(
@@ -204,11 +260,12 @@ def checkout(request):
             Payment.objects.create(
                 order=order,
                 mpesa_code=response.get("CheckoutRequestID", ""),
-                status='pending'
+                status='pending',
+                phone=phone
             )
-            request.session['cart'] = {} 
+            request.session['cart'] = {}  # clear cart
             messages.success(request, "Payment initiated. Check your phone to complete the payment.")
-            return redirect('menu')
+            return redirect('order_success', order_id=order.id)
         else:
             error_message = response.get("errorMessage") or response.get("ResponseDescription") or "Unknown error"
             messages.error(request, f"Payment failed: {error_message}")
@@ -217,40 +274,15 @@ def checkout(request):
         'cart_items': cart_items,
         'cart_total': cart_total,
     })
-    
-class CustomLoginView(LoginView):
-    template_name = 'restaurant/login.html'
-    success_url = '/'
 
-    def form_valid(self, form):
-        messages.success(self.request, "Login successful! Welcome back.")
-        return super().form_valid(form)
-    
 
-def add_to_cart(request, item_id):
-    if request.method == 'POST':
-        quantity = int(request.POST.get('quantity', 1))
-        cart = request.session.get('cart', {})
-        if not isinstance(cart, dict):
-            cart = {}
-        if 'quantity' in request.POST:
-            cart[str(item_id)] = quantity
-        else:
-            cart[str(item_id)] = cart.get(str(item_id), 0) + quantity
-        request.session['cart'] = cart
-        from django.contrib import messages
-        messages.success(request, "Item added to Cart!")
-        return redirect('view_cart')
-    return redirect(request.META.get('HTTP_REFERER', 'menu'))
-
+@login_required
 def view_cart(request):
     cart = request.session.get('cart', {})
     if not isinstance(cart, dict):
         cart = {}
 
-    cart_items = []
-    cart_total = 0
-
+    cart_items, cart_total = [], 0
     for item_id, quantity in cart.items():
         try:
             item_id = int(item_id)
@@ -271,6 +303,29 @@ def view_cart(request):
         'cart_total': cart_total,
     })
 
+
+def add_to_cart(request, item_id):
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+        except (ValueError, TypeError):
+            quantity = 1
+
+        cart = request.session.get('cart', {})
+        if not isinstance(cart, dict):
+            cart = {}
+
+        if 'quantity' in request.POST:
+            cart[str(item_id)] = quantity
+        else:
+            cart[str(item_id)] = cart.get(str(item_id), 0) + quantity
+
+        request.session['cart'] = cart
+        messages.success(request, "Item added to Cart!")
+        return redirect('view_cart')
+    return redirect(request.META.get('HTTP_REFERER', 'menu'))
+
+
 def remove_from_cart(request, item_id):
     cart = request.session.get('cart', {})
     if not isinstance(cart, dict):
@@ -284,42 +339,18 @@ def remove_from_cart(request, item_id):
 
 
 @login_required
-def process_payment(request):
-    if request.method == 'POST':
-        phone = request.POST.get('phone')
-        cart = request.session.get('cart', {})
-        cart_total = 0
-        for item_id, quantity in cart.items():
-            try:
-                item_id = int(item_id)
-                quantity = int(quantity)
-                product = MenuItem.objects.get(pk=item_id)
-                cart_total += product.price * quantity
-            except (ValueError, MenuItem.DoesNotExist):
-                continue
-
-        if not phone or not cart:
-            messages.error(request, "Invalid phone or empty cart.")
-            return redirect('checkout')
-
-        response = lipa_na_mpesa(phone, cart_total)
-        if response.get("ResponseCode") == "0":
-            messages.success(request, "Payment initiated. Check your phone.")
-            return redirect('menu')
-        else:
-            error_message = response.get("errorMessage") or response.get("ResponseDescription", "Unknown error")
-            messages.error(request, f"Payment failed: {error_message}")
-            return redirect('checkout')
-        
-@login_required
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'restaurant/order_success.html', {'order': order})
+
 
 @login_required
 def view_order(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'restaurant/view_order.html', {'order': order})
+
+
+# ---------- Events ----------
 
 def event_booking(request):
     if request.method == 'POST':
@@ -339,7 +370,7 @@ def event_booking(request):
                         f"Event Type: {booking.event_type}\n"
                         f"Message: {booking.message}"
                     ),
-                    from_email=None,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
                     recipient_list=[admin_email],
                     fail_silently=True,
                 )
@@ -350,10 +381,80 @@ def event_booking(request):
     return render(request, 'restaurant/event_booking.html', {'form': form})
 
 
-def custom_logout(request):
-    logout(request)
-    messages.success(request, "You have been logged out successfully.")
-    return redirect('index')
+# ---------- Staff flows ----------
+
+def staff_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user and hasattr(user, 'profile') and getattr(user.profile, 'role', None):
+            login(request, user)
+            return redirect('staff_dashboard')
+        else:
+            messages.error(request, 'Invalid credentials or not a staff member.')
+    return render(request, 'restaurant/staff_login.html')
+
+
+@login_required
+@user_passes_test(lambda u: hasattr(u, 'profile') and getattr(u.profile, 'role', None))
+def staff_dashboard(request):
+    orders = Order.objects.all().order_by('-created_at')
+    staff_role = getattr(request.user.profile, 'role', None)
+    return render(request, 'restaurant/staff_dashboard.html', {
+        'orders': orders,
+        'staff_role': staff_role,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: hasattr(u, 'profile') and getattr(u.profile, 'role', None))
+@require_POST
+def update_order_progress(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    staff_role = getattr(request.user.profile, 'role', None)
+    new_progress = request.POST.get('progress')
+    allowed = False
+
+    if staff_role == 'chef':
+        if order.progress == 'received' and new_progress == 'preparing':
+            allowed = True
+        elif order.progress == 'preparing' and new_progress == 'ready':
+            allowed = True
+    elif staff_role == 'waiter':
+        if order.progress == 'ready' and new_progress == 'served':
+            allowed = True
+    elif staff_role == 'manager':
+        allowed = True
+
+    if allowed:
+        order.progress = new_progress
+        order.save()
+
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"order_{order.id}",
+                {
+                    "type": "order_update",
+                    "order": {
+                        "id": order.id,
+                        "progress": order.progress,
+                        "status": order.status,
+                        "updated_by": request.user.username,
+                    }
+                }
+            )
+        except Exception:
+            pass
+
+        messages.success(request, "Order updated.")
+    else:
+        messages.error(request, "You are not allowed to update this order.")
+    return redirect('staff_dashboard')
+
 
 @login_required
 def my_orders(request):

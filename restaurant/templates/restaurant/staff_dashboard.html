@@ -1,0 +1,83 @@
+{% extends "restaurant/base.html" %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-center">Staff Dashboard</h2>
+    <div class="mb-3 text-center">
+        <span class="badge bg-primary fs-5">Role: {{ staff_role|title }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>
+                        <span class="badge {% if order.status == 'pending' %}bg-warning text-dark{% elif order.status == 'ready' %}bg-success{% elif order.status == 'served' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                            {{ order.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if order.progress == 'received' %}bg-warning text-dark{% elif order.progress == 'preparing' %}bg-info text-dark{% elif order.progress == 'ready' %}bg-success{% elif order.progress == 'served' %}bg-info text-dark{% elif order.progress == 'delivered' %}bg-primary{% elif order.progress == 'completed' %}bg-success{% elif order.progress == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ order.get_progress_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if staff_role == 'chef' and order.progress == 'received' or staff_role == 'chef' and order.progress == 'preparing' %}
+                            <form method="post" action="{% url 'update_order_progress' order.id %}">
+                                {% csrf_token %}
+                                {% if order.progress == 'received' %}
+                                    <input type="hidden" name="progress" value="preparing">
+                                    <button type="submit" class="btn btn-outline-info btn-sm">Mark as Preparing</button>
+                                {% elif order.progress == 'preparing' %}
+                                    <input type="hidden" name="progress" value="ready">
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Mark as Ready</button>
+                                {% endif %}
+                            </form>
+                        {% elif staff_role == 'waiter' and order.progress == 'ready' %}
+                            <form method="post" action="{% url 'update_order_progress' order.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="progress" value="served">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Mark as Served</button>
+                            </form>
+                        {% elif staff_role == 'manager' %}
+                            <form method="post" action="{% url 'update_order_progress' order.id %}">
+                                {% csrf_token %}
+                                <select name="progress" class="form-select form-select-sm mb-2">
+                                    <option value="received" {% if order.progress == 'received' %}selected{% endif %}>Received</option>
+                                    <option value="preparing" {% if order.progress == 'preparing' %}selected{% endif %}>Preparing</option>
+                                    <option value="ready" {% if order.progress == 'ready' %}selected{% endif %}>Ready</option>
+                                    <option value="served" {% if order.progress == 'served' %}selected{% endif %}>Served</option>
+                                    <option value="delivered" {% if order.progress == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="completed" {% if order.progress == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="cancelled" {% if order.progress == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Update</button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">No action available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+const socket = new WebSocket('ws://' + window.location.host + '/ws/orders/');
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    location.reload();
+};
+</script>
+{% endblock %}

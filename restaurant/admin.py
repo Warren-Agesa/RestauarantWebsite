@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MenuItem, Reservation, ContactMessage, Review, Order, OrderItem, Payment, EventBooking, HeroSlide, Event
+from .models import MenuItem, Reservation, ContactMessage, Review, Order, OrderItem, Payment, EventBooking, HeroSlide, Event, Profile
 
 @admin.register(HeroSlide)
 class HeroSlideAdmin(admin.ModelAdmin):
@@ -62,3 +62,10 @@ class EventBookingAdmin(admin.ModelAdmin):
     list_display = ('name', 'event_type', 'event_date', 'guests', 'created_at')
     search_fields = ('name', 'email', 'event_type')
     list_filter = ('event_type', 'event_date', 'created_at')
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'full_name', 'role')
+    list_filter = ('role',)
+    search_fields = ('user__username', 'full_name')
+
+admin.site.register(Profile, ProfileAdmin)

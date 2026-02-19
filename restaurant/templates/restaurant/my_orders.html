@@ -1,29 +1,47 @@
 {% extends "restaurant/base.html" %}
 {% block content %}
-<h2>My Orders</h2>
-{% if orders %}
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
-                <td>KES {{ order.total }}</td>
-                <td>{{ order.status }}</td>
-                <td><a href="{% url 'view_order' order.id %}">View</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>You have not placed any orders yet.</p>
-{% endif %}
+<div class="container py-5">
+    <h2 class="mb-4 text-center">My Orders</h2>
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>KES {{ order.total }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if order.status == 'pending' %}bg-warning text-dark
+                                {% elif order.status == 'ready' %}bg-success
+                                {% elif order.status == 'served' %}bg-info text-dark
+                                {% elif order.status == 'cancelled' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'view_order' order.id %}" class="btn btn-outline-primary btn-sm">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            You have not placed any orders yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

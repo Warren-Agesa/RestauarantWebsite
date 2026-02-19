@@ -84,12 +84,18 @@ class Profile(models.Model):
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
-    # Add more fields as needed, e.g. address, avatar, etc.
+    role = models.CharField(
+        max_length=30,
+        choices=[
+            ('chef', 'Chef'),
+            ('waiter', 'Waiter'),
+            ('manager', 'Manager'),
+            ('cashier', 'Cashier'),
+        ],
+        default='waiter'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s Profile"
     
     
 class Order(models.Model):
@@ -152,7 +158,6 @@ class HeroSlide(models.Model):
 
     def __str__(self):
         return self.title
-
     
 class Event(models.Model):
     title = models.CharField(max_length=200)
@@ -163,3 +168,11 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Payment(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="payments")
+    mpesa_code = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=20, default="pending")
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

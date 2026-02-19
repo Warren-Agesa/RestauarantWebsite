@@ -29,13 +29,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'restaurant',
-    'channels',
     'payments',
 ]
 
-ASGI_APPLICATION = 'madola_restaurant.asgi.application'
+
 WSGI_APPLICATION = 'madola_restaurant.wsgi.application'
 
 

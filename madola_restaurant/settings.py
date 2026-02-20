@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
-from django.contrib.auth import get_user_model
 
 load_dotenv()
 
@@ -183,13 +182,3 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.mydomain.com",
 ]
 
-if os.environ.get("RAILWAY_DEPLOY") == "true":
-    User = get_user_model()
-    username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
-    email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
-    password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
-
-    if username and email and password:
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(username=username, email=email, password=password)
-            print(f"Superuser '{username}' created.")
